@@ -1,0 +1,17 @@
+import requests
+import streamlit as st
+
+API_KEY = "ВАШ_КЛЮЧ"
+
+@st.cache_data(ttl=3600)
+def get_movie_info(title):
+    try:
+        headers = {"X-API-KEY": API_KEY}
+        url = f"https://api.kinopoisk.dev/v1.4/movie/search?query={title}"
+        res = requests.get(url, headers=headers, timeout=5).json()
+        if res.get('docs'):
+            m = res['docs'][0]
+            poster = m.get('poster', {}).get('url') or "https://placehold.co/400x600/161b22/f57c00?text=No+Poster"
+            return {"poster": poster, "desc": m.get('description'), "rating": m.get('rating', {}).get('kp')}
+    except: pass
+    return {"poster": "https://placehold.co/400x600/161b22/f57c00?text=No+Poster", "desc": "", "rating": 0}
